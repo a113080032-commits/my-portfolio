@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的錨點 - 個人作品集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // 顏色配置基於您提供的調色盤
+                        'soft-peach': '#F8D7B8', // 淺米色/背景色
+                        'coral-accent': '#FF9377', // 珊瑚紅/強調色
+                        'mint-gray': '#D4D7CC', // 淺灰綠/輔助背景色
+                        'mid-peach': '#E9AE8C', // 中間色
+                        'dusty-blue': '#8DAAA6', // 灰藍色/點綴色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 確保滾動時淡入效果的初始狀態 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* 自定義滾動條 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #E9AE8C; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF9377; }
+        
+        /* 頂部輪播專用 CSS */
+        .banner-item {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .banner-item.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* 特色區塊輪播效果 */
+        .feature-media-item {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .feature-media-item.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* 圖片/影片 模態視窗 CSS */
+        .modal {
+            display: none; /* 預設隱藏 */
+        }
+        .modal.open {
+            display: flex;
+        }
+
+        /* 讓小區域圖片可以點擊 hover */
+        .gallery-item-clickable {
+            cursor: pointer;
+            transition: transform 0.3s ease-out;
+        }
+        .gallery-item-clickable:hover {
+            transform: scale(1.05); /* 輕微放大彈出效果 */
+            z-index: 10;
+        }
+        /* 實體作品輪播項目，確保可以點擊 */
+        .physical-item-clickable {
+            cursor: pointer;
+            transition: transform 0.3s ease-out;
+        }
+        .physical-item-clickable:hover {
+            opacity: 1 !important; /* 確保懸停時不透明度為 1 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* 增加陰影強調可點擊性 */
+        }
+    </style>
+</head>
+
+<body class="bg-soft-peach font-sans text-gray-800 min-h-screen">
+
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm shadow-lg transition duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center text-sm md:text-base">
+            <div class="font-bold text-lg tracking-wider text-coral-accent">
+                我的作品集
+            </div>
+            <nav class="flex space-x-4 sm:space-x-8 font-medium">
+                <a href="#hero" class="text-gray-700 hover:text-dusty-blue transition duration-300 hover:scale-105">首頁</a>
+                <a href="#3d" class="text-gray-700 hover:text-dusty-blue transition duration-300 hover:scale-105">3D 製作</a>
+                <a href="#2d" class="text-gray-700 hover:text-dusty-blue transition duration-300 hover:scale-105">2D 插畫</a>
+                <a href="#physical" class="text-gray-700 hover:text-dusty-blue transition duration-300 hover:scale-105">實體商品</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        
+        <section id="top-banner" class="relative w-full h-[400px] md:h-[550px] overflow-hidden">
+            <div id="banner-carousel" class="w-full h-full relative">
+                <!-- 輪播內容由 JavaScript 產生 -->
+            </div>
+            
+            <div id="banner-dots" class="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20 p-2">
+                <!-- 輪播圓點由 JavaScript 產生 -->
+            </div>
+
+        </section>
+
+        <section id="hero" class="relative -mt-32 pt-32 pb-20 flex items-center justify-center p-8 overflow-hidden" 
+            style="scroll-margin-top: 50px; 
+                /* [圖片連結] 首頁背景圖片 URL */
+                background-image: url('插圖14_15.png'); 
+                background-size: cover; background-position: center;
+                background-attachment: fixed;">
+            <div class="relative z-10 text-center p-6 sm:p-10 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl max-w-4xl mx-auto scroll-reveal">
+                
+                <div class="mb-6 mx-auto w-32 h-32 rounded-full 
+                    overflow-hidden border-4 border-coral-accent/80 shadow-lg" 
+                    style="/* [圖片連結] 個人頭像圖片 URL */
+                        background-image: url('插圖122_5(1).png');
+                        background-size: cover; background-position: center;">
+                    </div>
+
+                <h1 class="text-5xl sm:text-6xl font-extrabold mb-2 text-gray-800 tracking-tighter" style="font-family: 'Inter', sans-serif;">
+                    海悅
+                </h1>
+                <p class="text-lg sm:text-xl font-light mb-8 text-gray-600">
+                    3D、2D和實體化製作的跨領域創作者
+                </p>
+
+                
+                <div class="flex justify-center space-x-6">
+                    <a href="https://www.facebook.com/share/1N9cgrtjtU/" target="_blank" class="text-dusty-blue hover:text-coral-accent transition duration-300 transform hover:scale-110" aria-label="Facebook">
+                        <i class="fab fa-facebook-f text-3xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/byangela2628?igsh=a3EzY3VvZDU0Y3pl" target="_blank" class="text-dusty-blue hover:text-coral-accent transition duration-300 transform hover:scale-110" aria-label="Instagram">
+                        <i class="fab fa-instagram text-3xl"></i>
+                    </a>
+                    <a href="mailto:byangela2628@gmail.com" class="text-dusty-blue hover:text-coral-accent transition duration-300 transform hover:scale-110" aria-label="電子郵件">
+                        <i class="fas fa-envelope text-3xl"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="3d" class="py-20 px-4 md:px-8 bg-mint-gray" style="scroll-margin-top: 50px;">
+            <div class="max-w-7xl mx-auto">
+    
+                <div class="flex flex-col sm:flex-row justify-center items-center mb-12 scroll-reveal">
+                    <h2 class="text-4xl font-bold text-gray-800 shrink-0 mb-4 sm:mb-0 sm:mr-6">3D 製作</h2>
+                    <p class="text-lg text-gray-700 text-center sm:text-left max-w-xl">
+                        3D創作涵蓋遊戲及動畫製作，專注於細節的打磨，從概念設計到最終成品，追求每個專案擁有最佳的體驗效果。
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+
+                    <div class="md:col-span-3 bg-white p-4 rounded-xl shadow-xl scroll-reveal relative h-[400px] md:h-[600px] overflow-hidden" style="transition-delay: 0.1s;">
+                        <h3 class="text-2xl font-bold text-coral-accent mb-2">精選 3D 作品</h3>
+                        
+                        <div id="3d-feature-media" class="relative w-full h-[90%] rounded-xl overflow-hidden">
+                            <!-- 3D 主作品輪播內容由 JavaScript 產生 -->
+                        </div>
+                        
+                        <button onclick="changeFeatureWork3D(-1)" class="absolute left-6 top-1/2 transform -translate-y-1/2 z-20 p-2 text-2xl text-white bg-gray-900/50 hover:bg-gray-900/80 rounded-full transition duration-300" aria-label="上一個 3D 作品">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="changeFeatureWork3D(1)" class="absolute right-6 top-1/2 transform -translate-y-1/2 z-20 p-2 text-2xl text-white bg-gray-900/50 hover:bg-gray-900/80 rounded-full transition duration-300" aria-label="下一個 3D 作品">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="md:col-span-2 grid grid-cols-2 gap-4 md:h-[600px]">
+                        <!-- 3D 畫廊 1：場景渲染 -->
+                        <div onclick="openModal(gallery3D_1_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-2 h-64 md:h-auto md:min-h-[40%]" style="transition-delay: 0.2s;">
+                            <div class="w-full h-full bg-cover bg-center flex items-end p-4" style="/* [圖片連結] 3D 場景渲染圖片 URL */
+                                background-image: url(期末截圖2.jpg);">
+                                <span class="text-white text-base font-semibold bg-gray-800/60 rounded px-2 py-1">Maya室內場景設計</span>
+                            </div>
+                        </div>
+                        <!-- 3D 畫廊 2：紋理測試 -->
+                        <div onclick="openModal(gallery3D_2_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-1 h-32 md:h-auto md:min-h-[30%]" style="transition-delay: 0.3s;">
+                            <div class="w-full h-full bg-cover bg-center flex items-end p-2" style="/* [圖片連結] 3D 紋理測試圖片 URL */
+                                background-image: url(期末截圖1_壓縮.jpg);">
+                                <span class="text-white text-xs bg-gray-800/60 rounded px-1"></span>
+                            </div>
+                        </div>
+                        <!-- 3D 畫廊 3：相機 View (已更換為圖片) -->
+                        <div onclick="openModal(gallery3D_3_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-1 h-32 md:h-auto md:min-h-[30%]" style="transition-delay: 0.4s;">
+                             <!-- 這裡改為使用背景圖片 -->
+                            <div class="w-full h-full bg-cover bg-center flex items-center justify-center" 
+                                style="background-image: url('期末截圖3 (1).jpg'); background-size: cover; background-position: center;">
+                                <!-- 移除 i 標籤，讓圖片完全佔據 -->
+                            </div>
+                        </div>
+                        <!-- 3D 畫廊 4：低模展示 -->
+                        <div onclick="openModal(gallery3D_4_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-2 h-32 md:h-auto md:min-h-[30%]" style="transition-delay: 0.5s;">
+                            <div class="w-full h-full bg-cover bg-center flex items-end p-4" style="/* [圖片連結] 3D 低模展示圖片 URL */
+                                background-image: url(插圖257_2.png);">
+                                <span class="text-white text-base font-semibold bg-gray-800/60 rounded px-2 py-1">Blender設計</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="2d" class="py-20 px-4 md:px-8 bg-soft-peach" style="scroll-margin-top: 50px;">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col sm:flex-row justify-center items-center mb-12 scroll-reveal">
+                    <h2 class="text-4xl font-bold text-gray-800 shrink-0 mb-4 sm:mb-0 sm:mr-6">2D 插畫及動畫</h2>
+                    <p class="text-lg text-gray-700 text-center sm:text-left max-w-xl">
+                        創造引人入勝的視覺體驗，從插畫到流暢的動畫製作，希望讓觀看者沉浸在故事中，感受溫暖與樂趣。
+                    </p>
+                </div>
+
+                 <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+
+                    <div class="md:col-span-3 bg-white p-4 rounded-xl shadow-xl scroll-reveal relative h-[400px] md:h-[600px] overflow-hidden" style="transition-delay: 0.1s;">
+                        <h3 class="text-2xl font-bold text-coral-accent mb-2">精選 2D 作品</h3>
+                        
+                        <div id="2d-feature-media" class="relative w-full h-[90%] rounded-xl overflow-hidden">
+                            <!-- 2D 主作品輪播內容由 JavaScript 產生 -->
+                        </div>
+                        
+                        <button onclick="changeFeatureWork2D(-1)" class="absolute left-6 top-1/2 transform -translate-y-1/2 z-20 p-2 text-2xl text-white bg-gray-900/50 hover:bg-gray-900/80 rounded-full transition duration-300" aria-label="上一個 2D 作品">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="changeFeatureWork2D(1)" class="absolute right-6 top-1/2 transform -translate-y-1/2 z-20 p-2 text-2xl text-white bg-gray-900/50 hover:bg-gray-900/80 rounded-full transition duration-300" aria-label="下一個 2D 作品">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="md:col-span-2 grid grid-cols-2 gap-4 md:h-[600px]">
+                        
+                         <!-- 2D 畫廊 1：角色草稿 -->
+                         <div onclick="openModal(gallery2D_1_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md 
+                            overflow-hidden col-span-1 h-32 md:h-auto md:min-h-[30%]" style="transition-delay: 0.2s;">
+                            <div class="w-full h-full bg-cover bg-center flex items-end p-2" style="/* [圖片連結] 2D 角色草稿圖片 URL */
+                                background-image: url(插圖113_2.png);">
+                                <span class="text-gray-800 text-xs bg-white/70 rounded px-1"></span>
+                            </div>
+                        </div>
+                        <!-- 2D 畫廊 2：場景概念圖 -->
+                        <div onclick="openModal(gallery2D_2_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-1 md:row-span-2 h-64 md:h-auto md:min-h-[40%]" style="transition-delay: 0.3s;">
+                            <div class="w-full h-full bg-cover bg-center flex items-end p-4" style="/* [圖片連結] 2D 場景概念圖圖片 URL */
+                                background-image: url(插圖161_立繪.png);">
+                                <span class="text-white text-base font-semibold bg-gray-800/60 rounded px-2 py-1">故事性插畫</span>
+                            </div>
+                        </div>
+                        <!-- 2D 畫廊 3：動畫分鏡 -->
+                        <div onclick="openModal(gallery2D_3_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-1 h-32 md:h-auto md:min-h-[30%]" style="transition-delay: 0.4s;">
+                            <div class="w-full h-full bg-cover bg-center 
+                                flex items-end p-2" style="/* [圖片連結] 2D 動畫分鏡圖片 URL */
+                                background-image: url(插圖14_15.png);">
+                                <span class="text-white text-xs bg-gray-800/60 rounded px-1"></span>
+                            </div>
+                        </div>
+                        <!-- 2D 畫廊 4：圖層檢視 (已更換為圖片) -->
+                        <div onclick="openModal(gallery2D_4_ModalUrl)" class="gallery-item-clickable scroll-reveal bg-white rounded-xl shadow-md overflow-hidden col-span-2 h-32 md:h-auto md:min-h-[30%]" style="transition-delay: 0.5s;">
+                            <!-- 這裡改為使用背景圖片 -->
+                            <div class="w-full h-full bg-cover bg-center flex items-center justify-center" 
+                                style="background-image: url('貓貓魚抱腿.png'); background-size: cover; background-position: center;">
+                                <!-- 移除 i 標籤，讓圖片完全佔據 -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <section id="physical" class="py-20 px-4 md:px-8 bg-mint-gray" style="scroll-margin-top: 50px;">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col sm:flex-row justify-center items-center mb-12 scroll-reveal">
+                    <h2 class="text-4xl font-bold text-gray-800 shrink-0 mb-4 sm:mb-0 sm:mr-6">實體作品</h2>
+                    <p class="text-lg text-gray-700 text-center sm:text-left max-w-xl">
+                        一筆一畫，手工製作，每個部分都埋藏著故事及理念。
+                    </p>
+                </div>
+                
+                <div class="relative flex items-center justify-center scroll-reveal">
+                    <button id="physical-prev" onclick="changePhysicalWork(-1)" class="absolute left-0 z-20 p-3 text-2xl text-dusty-blue hover:text-coral-accent transition duration-300 rounded-full bg-white/80 shadow-lg ml-2 
+                        transform hover:scale-110" aria-label="上一張">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <div id="physical-carousel" class="flex justify-center items-center w-full overflow-hidden p-4 space-x-4">
+                        <!-- 實體商品輪播內容由 JavaScript 產生 -->
+                    </div>
+
+                    <button id="physical-next" onclick="changePhysicalWork(1)" class="absolute right-0 z-20 p-3 text-2xl text-dusty-blue hover:text-coral-accent transition duration-300 rounded-full bg-white/80 shadow-lg mr-2 transform hover:scale-110" aria-label="下一張">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-mint-gray p-8 text-center text-sm">
+            <p>&copy; 海悅 |
+                作品集網站</p>
+        </footer>
+
+    </main>
+
+    <!-- 圖片放大模態視窗 (保留給其他圖片) -->
+    <div id="image-modal" class="modal fixed inset-0 z-[100] bg-black/80 items-center justify-center p-4" onclick="closeImageModal(event)">
+        <div class="relative max-w-4xl max-h-[90%] w-full" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute -top-4 -right-4 z-20 w-10 h-10 bg-coral-accent hover:bg-mid-peach text-white text-xl rounded-full 
+                shadow-lg transition duration-300 transform hover:scale-110" aria-label="關閉圖片">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <img id="modal-image" src="" alt="放大作品圖" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl mx-auto">
+            </div>
+    </div>
+
+    <!-- 影片播放模態視窗 (新增給旋轉杯) -->
+    <div id="video-modal" class="modal fixed inset-0 z-[100] bg-black/80 items-center justify-center p-4" onclick="closeVideoModal(event)">
+        <div class="relative max-w-4xl max-h-[90%] w-full aspect-video" onclick="event.stopPropagation()">
+            <button onclick="closeVideoModal()" class="absolute -top-4 -right-4 z-20 w-10 h-10 bg-coral-accent hover:bg-mid-peach text-white text-xl rounded-full 
+                shadow-lg transition duration-300 transform hover:scale-110" aria-label="關閉影片">
+                <i class="fas fa-times"></i>
+            </button>
+            <!-- muted 防止自動播放時發出聲音，autoplay 確保打開即播放，playsinline 確保在 iOS 上正常播放 -->
+            <video id="modal-video" src="" controls autoplay muted loop playsinline class="w-full h-full object-contain rounded-xl shadow-2xl mx-auto bg-black"></video>
+        </div>
+    </div>
+
+
+    <script>
+        // ==========================================================
+        // *** 集中管理所有圖片和影片連結的變數區塊 ***
+        // 建議您直接修改此區塊的 URL 來更換圖片或影片。
+        // ==========================================================
+
+        // --- 1. 頂部 Banner 輪播圖片 (4 張) ---
+        const topBannerWorks = [
+            // [圖片連結] 輪播圖片 1 URL
+            { id: 1, title: "我的作品1", imageUrl: '插圖161_簡化版.png' }, 
+            // [圖片連結] 輪播圖片 2 URL
+            { id: 2, title: "我的作品2", imageUrl: '插圖317_3.png' }, 
+            // [圖片連結] 輪播圖片 3 URL
+            { id: 3, title: "我的作品3", imageUrl: '期末截圖2.jpg' },
+            // [圖片連結] 輪播圖片 4 URL
+            { id: 4, title: "我的作品4", imageUrl: '螢幕擷取畫面 2025-11-10 213945 (1).png' }, 
+        ];
+
+        // --- 2. Hero 區塊 (已在 HTML 標註) ---
+        // 背景圖片: '插圖14_15.png'
+        // 頭像圖片: '插圖122_5(1).png'
+
+        // --- 3. 3D 製作 - 主區塊輪播 (已移除第三個作品) ---
+        // type: 'img' (圖片) 或 'video' (影片)
+        const feature3DWorks = [
+            // [影片連結] 3D 主作品 1 (影片) URL
+            { id: 1, type: 'video', text: "Unreal場景設計", videoUrl: '遊戲場景.mp4' },
+            // [影片連結] 3D 主作品 2 (影片) URL
+            { id: 2, type: 'video', text: "Unreal動畫製作", videoUrl: '期末影片.mp4', color: 'D4D7CC' },
+            // 作品 3 已被移除，請注意索引的改變。
+        ];
+
+        // --- 4. 3D 製作 - 畫廊小圖 (4 張) ---
+        // 畫廊 1：場景渲染
+        const gallery3D_1_ImageUrl = 'https://placehold.co/400x500/8DAAA6/ffffff?text=場景渲染'; // 小圖 URL
+        const gallery3D_1_ModalUrl = '期末截圖2.jpg'; // 放大 Modal URL
+        // 畫廊 2：紋理測試
+        const gallery3D_2_ImageUrl = 'https://placehold.co/200x200/FF9377/ffffff?text=紋理測試'; // 小圖 URL
+        const gallery3D_2_ModalUrl = '期末截圖1_壓縮.jpg'; // 放大 Modal URL
+        // 畫廊 3：相機 View (已更換圖片)
+        const gallery3D_3_ImageUrl = ''; // 小圖 URL (此處為圖標，無實際圖片)
+        const gallery3D_3_ModalUrl = '期末截圖3 (1).jpg'; // 放大 Modal URL
+        // 畫廊 4：低模展示
+        const gallery3D_4_ImageUrl = 'https://placehold.co/400x150/E9AE8C/ffffff?text=低模展示'; // 小圖 URL
+        const gallery3D_4_ModalUrl = '插圖257_2.png'; // 放大 Modal URL
+
+        // --- 5. 2D 插畫 - 主區塊輪播 ---
+        const feature2DWorks = [
+            // [影片連結] 2D 主作品 1 (影片) URL
+            { id: 1, type: 'video', text: "Q版角色動畫", videoUrl: '插圖300_1.mp4' },
+            // [影片連結] 2D 主作品 2 (影片) URL
+            { id: 2, type: 'video', text: "2D動畫-共同創作", videoUrl: '期末動畫（無title）.mp4', color: 'F8D7B8' },
+            // [影片連結] 2D 主作品 3 (影片) URL
+            { id: 3, type: 'video', text: "精緻插畫", videoUrl: '我的影片：1_1.mp4' }
+        ];
+
+        // --- 6. 2D 插畫 - 畫廊小圖 (4 張) ---
+        // 畫廊 1：角色草稿
+        const gallery2D_1_ImageUrl = '插圖113_2.png'; // 小圖 URL
+        const gallery2D_1_ModalUrl = '插圖113_2.png'; // 放大 Modal URL
+        // 畫廊 2：場景概念圖
+        const gallery2D_2_ImageUrl = 'https://placehold.co/400x500/E9AE8C/ffffff?text=場景概念圖'; // 小圖 URL
+        const gallery2D_2_ModalUrl = '插圖161_簡化版.png'; // 放大 Modal URL
+        // 畫廊 3：動畫分鏡
+        const gallery2D_3_ImageUrl = 'https://placehold.co/200x200/FF9377/ffffff?text=動畫分鏡'; // 小圖 URL
+        const gallery2D_3_ModalUrl = '插圖14_15.png'; // 放大 Modal URL
+        // 畫廊 4：圖層檢視 (已更換圖片)
+        const gallery2D_4_ImageUrl = ''; // 小圖 URL (此處為圖標，無實際圖片)
+        const gallery2D_4_ModalUrl = '貓貓魚抱腿.png'; // 放大 Modal URL
+        
+        // --- 7. 實體商品輪播圖片 (5 張) ---
+        const physicalWorks = [
+            // [圖片連結] 實體商品 1 URL
+            { id: 1, text: "敘事插畫-神話故事改編", imageUrl: '12張故事.jpg' }, // 標註文字更新
+            // [圖片連結] 實體商品 2 URL
+            { id: 2, text: "植物紀錄", imageUrl: '朱槿.jpg' }, // 標註文字更新
+            // [圖片連結] 實體商品 3 URL
+            { id: 3, text: "昆蟲紀錄", imageUrl: '蝴蝶.jpg' }, // 標註文字更新
+            // [圖片連結] 實體商品 4 URL - 旋轉杯
+            { id: 4, text: "旋轉杯子漫畫(點擊觀看影片)", imageUrl: '旋轉杯.jpg' }, // 標註文字更新
+            // [圖片連結] 實體商品 5 URL
+            { id: 5, text: "奇異昆蟲設計-共同創作", imageUrl: '蛾.jpg' } // 標註文字更新
+        ];
+        
+        // --- 8. 旋轉杯影片連結 (新增) ---
+        const rotatingCupVideoUrl = '旋轉杯影片.mp4'; 
+        
+        // ==========================================================
+        // *** 變數區塊結束 ***
+        // ==========================================================
+
+        // --- Modal 圖片放大邏輯 (更名為 ImageModal) ---
+        const imageModal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+
+        function openImageModal(imageUrl) {
+            // [圖片位置標註] 模態視窗圖片的來源 URL
+            modalImage.src = imageUrl;
+            imageModal.classList.add('open');
+            document.body.style.overflow = 'hidden'; // 禁用背景滾動
+        }
+
+        function closeImageModal(event) {
+            // 只有點擊 Modal 本身或關閉按鈕才關閉
+            // 檢查點擊的元素是否為 modal 本身（或沒有傳入 event 則直接關閉）
+            if (event && event.target !== imageModal) {
+                return;
+            }
+            imageModal.classList.remove('open');
+            document.body.style.overflow = ''; // 恢復背景滾動
+        }
+        
+        // --- Modal 影片播放邏輯 (新增 VideoModal) ---
+        const videoModal = document.getElementById('video-modal');
+        const modalVideo = document.getElementById('modal-video');
+        
+        function openVideoModal(videoUrl) {
+            modalVideo.src = videoUrl;
+            videoModal.classList.add('open');
+            // 由於設定了 autoplay，影片會自動播放
+            modalVideo.play();
+            document.body.style.overflow = 'hidden'; // 禁用背景滾動
+        }
+        
+        function closeVideoModal(event) {
+            if (event && event.target !== videoModal) {
+                return;
+            }
+            modalVideo.pause(); // 暫停影片
+            modalVideo.src = ''; // 清空 src 以停止加載
+            videoModal.classList.remove('open');
+            document.body.style.overflow = ''; // 恢復背景滾動
+        }
+
+        // 將函式暴露給 HTML 中的 onclick 事件
+        // 保持 openModal 的兼容性，讓畫廊區塊不用修改
+        window.openModal = openImageModal; 
+        window.closeModal = closeImageModal;
+        window.openImageModal = openImageModal;
+        window.closeImageModal = closeImageModal;
+        window.openVideoModal = openVideoModal;
+        window.closeVideoModal = closeVideoModal;
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. 頂部 Banner 輪播邏輯 (5秒自動切換，圓點指示) ---
+            
+            let currentBannerIndex = 0;
+            const bannerCarousel = document.getElementById('banner-carousel');
+            const bannerDots = document.getElementById('banner-dots');
+            let bannerInterval;
+
+            function renderTopBanner() {
+                // 渲染圖片
+                bannerCarousel.innerHTML = topBannerWorks.map((work, index) => `
+                    <div data-index="${index}" class="banner-item ${index === currentBannerIndex ? 'active' : ''}" 
+                        style="background-image: url('${work.imageUrl}');
+                        background-size: cover; background-position: center;">
+                        </div>
+                `).join('');
+
+                // 渲染圓點
+                bannerDots.innerHTML = topBannerWorks.map((_, index) => `
+                    <button data-index="${index}" class="dot w-3 h-3 rounded-full transition-colors duration-300 ${index === currentBannerIndex ? 'bg-coral-accent scale-110' : 'bg-white/80 hover:bg-white'}" onclick="changeBanner(${index})" aria-label="切換到圖片 ${index + 1}"></button>
+                `).join('');
+            }
+
+            function changeBanner(newIndex) {
+                // 清除自動播放計時器
+                clearInterval(bannerInterval);
+                
+                // 更新索引
+                currentBannerIndex = newIndex;
+                
+                // 重新渲染並重新啟動自動播放
+                renderTopBanner();
+                startTopBannerAutoPlay();
+            }
+
+            function startTopBannerAutoPlay() {
+                bannerInterval = setInterval(() => {
+                    currentBannerIndex = (currentBannerIndex + 1) % topBannerWorks.length;
+                    renderTopBanner();
+                }, 5000); // 5秒自動切換
+            }
+
+            window.changeBanner = changeBanner; // 暴露給 HTML 點擊事件
+
+            // --- 2. Scroll Reveal (滾動淡入) 邏輯 ---
+            // 修改: 當元素離開視野時，移除 is-visible 類別，使其可以重複觸發淡入效果。
+            const sections = document.querySelectorAll('.scroll-reveal');
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // 當元素進入視野時：添加類別以觸發淡入效果
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        // 當元素離開視野時：移除類別以重置動畫狀態 (使其可以再次淡入)
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            }, {
+                rootMargin: '0px',
+                threshold: 0.1 // 元素可見度達到 10% 時觸發
+            });
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // --- 3. 實體商品輪播邏輯 (更新點擊事件處理) ---
+            
+            let currentPhysicalIndex = 0; // 當前中間放大的作品索引 (0-4)
+            const physicalCarousel = document.getElementById('physical-carousel');
+            function renderPhysicalCarousel() {
+                // 清空舊的內容
+                physicalCarousel.innerHTML = '';
+                // 根據當前索引，決定要顯示哪三個作品
+                // 前一個: (currentPhysicalIndex - 1 + 5) % 5
+                // 中間: currentPhysicalIndex
+                // 後一個: (currentPhysicalIndex + 1) % 5
+                const indicesToShow = [
+                    (currentPhysicalIndex - 1 + physicalWorks.length) % physicalWorks.length,
+                    currentPhysicalIndex,
+                    (currentPhysicalIndex + 1) % physicalWorks.length
+                ];
+                indicesToShow.forEach((index, i) => {
+                    const work = physicalWorks[index];
+                    const isCenter = i === 1; // 中間那個作品
+
+                    // 設置寬度和高度。中心作品為正方形且較大。
+                    const sizeClass = isCenter ? 'w-80 h-80 sm:w-96 sm:h-96' : 'w-64 h-64 sm:w-72 sm:h-72';
+                    // 設置縮放和陰影。
+                    const scaleClass = isCenter ? 'scale-100 shadow-2xl z-10 border-coral-accent' : 'scale-90 opacity-70 shadow-lg border-coral-accent/20';
+                    const marginClass = isCenter ? 'mx-0 sm:mx-4' : 'mx-0';
+                    
+                    // 從變數中取得圖片 URL
+                    const finalImageUrl = work.imageUrl;
+                    
+                    // *** 關鍵修改：根據 ID 決定點擊行為 ***
+                    let clickAction;
+                    if (work.id === 4) {
+                        // 旋轉杯作品，播放影片
+                        clickAction = `openVideoModal('${rotatingCupVideoUrl}')`;
+                    } else {
+                        // 其他作品，放大圖片
+                        clickAction = `openImageModal('${finalImageUrl}')`;
+                    }
+                    // *************************************
+
+                    const element = document.createElement('div');
+                    // *** 在這裡添加計算後的點擊事件 clickAction ***
+                    element.className = `physical-item physical-item-clickable flex-shrink-0 ${sizeClass} transition-all duration-500 transform ${scaleClass} ${marginClass} rounded-xl overflow-hidden bg-cover bg-center flex items-end justify-center border-4`;
+                    element.style.backgroundImage = `url('${finalImageUrl}')`;
+                    element.setAttribute('onclick', clickAction); // 使用計算出的點擊事件
+                    
+                    // 標註文字移至圖片最底部
+                    element.innerHTML = `<span class="text-white text-lg font-bold drop-shadow-lg p-2 bg-gray-800/60 w-full text-center">${work.text}</span>`;
+                    
+                    physicalCarousel.appendChild(element);
+                });
+            }
+
+            function changePhysicalWork(direction) {
+                currentPhysicalIndex = (currentPhysicalIndex + direction + physicalWorks.length) % physicalWorks.length;
+                renderPhysicalCarousel();
+            }
+
+            // 將 changePhysicalWork 暴露給 HTML 中的 onclick
+            window.changePhysicalWork = changePhysicalWork;
+            
+            // --- 4. 3D & 2D 主區塊輪播邏輯 (移除「影片播放中」並調整標註位置) ---
+            
+            let current3DIndex = 0;
+            let current2DIndex = 0;
+
+            function renderFeatureBlock(sectionId, works, currentIndex) {
+                const container = document.getElementById(`${sectionId}-feature-media`);
+                if (!container) return;
+
+                // 移除所有舊的項目
+                container.innerHTML = '';
+                const work = works[currentIndex];
+                let contentElement = document.createElement('div');
+                contentElement.className = 'feature-media-item active w-full h-full relative';
+                
+                if (work.type === 'img') {
+                    // 圖片
+                    const imageUrl = work.imageUrl;
+                    contentElement.style.backgroundImage = `url('${imageUrl}');`;
+                    contentElement.style.backgroundSize = 'cover';
+                    contentElement.style.backgroundPosition = 'center';
+                    // 標註文字移到左下角
+                    contentElement.innerHTML = `<span class="absolute bottom-4 left-4 text-white text-lg font-bold p-2 bg-gray-800/60 rounded">${work.text}</span>`;
+                } else if (work.type === 'video') {
+                    // 影片
+                    const videoUrl = work.videoUrl;
+                    
+                    // 為了確保影片能正常播放並適應容器，使用 <video> 標籤
+                    contentElement.innerHTML = `
+                        <video controls class="w-full h-full object-cover rounded-xl" autoplay loop muted playsinline>
+                            <source src="${videoUrl}" type="video/mp4">
+                            <!-- 如果您的影片格式不是 mp4，請在這裡新增更多 <source> 標籤 -->
+                            您的瀏覽器不支援影片播放。
+                        </video>
+                        <!-- 移除「影片播放中」標籤 -->
+                        <span class="absolute bottom-4 left-4 text-white text-lg font-bold p-2 bg-gray-800/60 rounded">${work.text}</span>
+                    `;
+                    contentElement.className += ' bg-gray-900';
+                }
+
+                container.appendChild(contentElement);
+            }
+
+            function changeFeatureWork(sectionId, works, direction) {
+                let currentIndex;
+                if (sectionId === '3d') {
+                    currentIndex = current3DIndex;
+                } else {
+                    currentIndex = current2DIndex;
+                }
+                
+                // 計算新索引
+                const newIndex = (currentIndex + direction + works.length) % works.length;
+                // 更新狀態
+                if (sectionId === '3d') {
+                    current3DIndex = newIndex;
+                } else {
+                    current2DIndex = newIndex;
+                }
+
+                renderFeatureBlock(sectionId, works, newIndex);
+            }
+
+            // 暴露給 HTML 中的 onclick
+            window.changeFeatureWork3D = (direction) => changeFeatureWork('3d', feature3DWorks, direction);
+            window.changeFeatureWork2D = (direction) => changeFeatureWork('2d', feature2DWorks, direction);
+
+            // 首次加載時渲染所有輪播
+            renderTopBanner();
+            startTopBannerAutoPlay();
+            renderPhysicalCarousel(); // 實體作品輪播
+            // 首次渲染 Feature Block
+            renderFeatureBlock('3d', feature3DWorks, current3DIndex);
+            renderFeatureBlock('2d', feature2DWorks, current2DIndex);
+        });
+    </script>
+</body>
+</html>
